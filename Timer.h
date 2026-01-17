@@ -1,3 +1,6 @@
+#ifndef TIMER_H
+#define TIMER_H
+
 #include <chrono>
 #include <iostream>
 
@@ -17,3 +20,5 @@ public:
 private:
 	DurationType m_creationTime {};
 };
+
+#endif
