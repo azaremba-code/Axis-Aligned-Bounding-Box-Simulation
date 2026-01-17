@@ -10,6 +10,6 @@ int main() {
 
 	sim.runMany(10'000'000);
 
-	std::cout << sim.getAverageRatio() << std::endl;
+	std::cout << "Average ratio: " << sim.getAverageRatio() << std::endl;
 	return 0;
 }
