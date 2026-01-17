@@ -1,10 +1,13 @@
 #include <iostream>
 
 #include "Random.h"
+#include "Simulation.h"
 
 int main() {
-	auto rand {Random::get<double>()};
-	std::cout << rand << std::endl;
+	Simulation<double> sim {};
 
+	sim.runMany(1'000'000);
+
+	std::cout << sim.getAverageRatio() << std::endl;
 	return 0;
 }
