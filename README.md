@@ -10,3 +10,11 @@ Runs a simulation to find the average ratio of the area of a polygon to its axis
 ## Usage
 
 ```./a.out```
+
+## Dependencies
+g++ 13.x (libstdc++ 13.x) or later
+
+Included with default installation of g++ on Ubuntu-24.04
+
+## Troubleshooting
+If you see errors such as "no operator<<", then you may have an outdated version of libstdc++.
