@@ -7,19 +7,36 @@
 #include <concepts>
 #include <iostream>
 #include <random>
+#include <vector>
+#include <utility>
+#include <thread>
+#include <sched.h>
 
-// #include "common/Timer.h"
+#include "common/Concurrency.h"
 
 template <std::floating_point FloatType>
 class Simulation {
 public:
+	typedef FloatType floatType;
+	
 	Simulation(int runCount, int polygonPointCount = 3) :
 		m_polygonPointCount {polygonPointCount},
 		m_runCount {runCount},
 		m_RatiosSum {0}
 	{
 		assert(m_polygonPointCount >= 3 && "Polygons must have at least 3 points.");
-		std::cout << "Simulation initialized with " << m_polygonPointCount << " points and " << m_runCount << " runs." << std::endl;
+		// current core number
+		int coreNumber = Concurrency::get_current_core();
+		bool isPinned = Concurrency::is_thread_pinned();
+		std::cout << "Simulation initialized with " << m_polygonPointCount << " points and " << m_runCount << " runs on core " << coreNumber << " and is " << (isPinned?"":"not ") << "pinned" << std::endl;
+	}
+
+	FloatType getRunCount() {
+		return m_runCount;
+	}
+
+	FloatType getRatiosSum() {
+		return m_RatiosSum;
 	}
 
 	FloatType getAverageRatio() {
@@ -69,8 +86,7 @@ private:
 	int m_polygonPointCount {};	
 	int m_runCount {};
 	FloatType m_RatiosSum {};
-	std::random_device m_rd {};
-	std::mt19937 m_mt {m_rd()};
+	std::mt19937 m_mt {std::random_device{}()};
 	std::uniform_real_distribution<FloatType> m_dist {1.0, 2.0};
 
 	static FloatType getPolygonArea(const std::vector<Point>& points) {

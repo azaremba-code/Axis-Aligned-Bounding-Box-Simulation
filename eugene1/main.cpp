@@ -8,7 +8,7 @@ int main() {
 	Timer timer {};
 	Simulation<double> sim {};
 
-	sim.runMany(10'000'000);
+	sim.runMany(1'000'000'000);
 
 	std::cout << "Average ratio: " << sim.getAverageRatio() << std::endl;
 	return 0;

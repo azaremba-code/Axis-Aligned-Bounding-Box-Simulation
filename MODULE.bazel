@@ -1,0 +1,6 @@
+module(
+    name = "axis_aligned_bb_sim",
+    version = "1.0.0",
+)
+
+bazel_dep(name = "argparse", version = "3.0")

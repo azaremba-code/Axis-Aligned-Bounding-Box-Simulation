@@ -200,6 +200,19 @@ bazel build //:all_binaries --config=custom
 
 ---
 
+## IDE Integration (clangd)
+
+The `.clangd` file is configured with the necessary include paths (`-Iinclude`) and compilation flags for basic clangd support. This should work for most cases.
+
+For full Bazel integration with `compile_commands.json`, you can use external tools like:
+- `bazel-compile-commands-extractor` (hedronvision)
+- `hedgehog` 
+- Or manually generate compile commands using `bazel aquery`
+
+The current `.clangd` configuration should be sufficient for basic IntelliSense and error checking.
+
+---
+
 ## Troubleshooting
 
 - **Config value not found (e.g. `Config value 'opt' is not defined`)**  

@@ -6,7 +6,10 @@ cc_binary(
         "main.cpp",
         "Simulation.h",
     ],
-    deps = ["//include:common"],
+    deps = [
+        "//include:common",
+        "@argparse",
+    ],
     copts = [
         "-std=c++20",
         "-Wall",
