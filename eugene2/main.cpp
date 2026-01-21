@@ -1,14 +1,13 @@
 #include <iostream>
 
-#include "Random.h"
 #include "Simulation.h"
-#include "Timer.h"
+#include "common/Timer.h"
 
 int main() {
 	Timer timer {};
-	Simulation<double> sim {};
+	Simulation<double> sim {50'000'000};
 
-	sim.runMany(10'000'000);
+	sim.run();
 
 	std::cout << "Average ratio: " << sim.getAverageRatio() << std::endl;
 	return 0;

@@ -1,0 +1,19 @@
+# Build configurations
+
+# Debug build (default)
+build:dbg --compilation_mode=dbg
+build:dbg --copt=-g
+build:dbg --copt=-O0
+
+# Optimized build
+build:opt --compilation_mode=opt
+build:opt --copt=-O3
+build:opt --copt=-DNDEBUG
+
+# Common settings
+build --cxxopt=-std=c++20
+build --incompatible_enable_cc_toolchain_resolution
+
+# Less verbose output: hide most progress spam, keep warnings/errors
+build --noshow_progress
+build --ui_event_filters=error,warning

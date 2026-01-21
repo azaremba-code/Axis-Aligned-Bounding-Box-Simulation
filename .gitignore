@@ -1,1 +1,5 @@
 *.out
+bazel-bin
+bazel-out
+bazel-testlogs
+bazel-Axis-Aligned-Bounding-Box-Simulation
