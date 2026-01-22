@@ -3,4 +3,40 @@ module(
     version = "1.0.0",
 )
 
-bazel_dep(name = "argparse", version = "3.0")
+
+# -- bazel_dep definitions -- #
+bazel_dep(name = "rules_cc", version = "0.2.14")
+bazel_dep(name = "rules_python", version = "1.7.0")
+
+# Hedron's Compile Commands Extractor for Bazel
+# https://github.com/hedronvision/bazel-compile-commands-extractor
+# Note: Requires rules_python to be available (added above)
+# Using archive_override with patch to fix Bazel 9 compatibility (native.py_binary -> py_binary)
+bazel_dep(name = "hedron_compile_commands", dev_dependency = True)
+archive_override(
+    module_name = "hedron_compile_commands",
+    urls = ["https://github.com/hedronvision/bazel-compile-commands-extractor/archive/0e990032f3c5a866e72615cf67e5ce22186dcb97.tar.gz"],
+    strip_prefix = "bazel-compile-commands-extractor-0e990032f3c5a866e72615cf67e5ce22186dcb97",
+    patches = [
+        "//:hedron_compile_commands.patch",
+        "//:hedron_compile_commands_module.patch",
+        "//:hedron_compile_commands_build.patch",
+    ],
+    patch_strip = 0,
+)
+
+# Note: argparse 3.2.0 from BCR (https://registry.bazel.build/modules/argparse) has a bug:
+# The BUILD.bazel file is missing the required `load("@rules_cc//cc:defs.bzl", "cc_library")` 
+# statement needed for Bazel 9 compatibility. Until this is fixed in BCR, we use a 
+# module_extension to provide a corrected BUILD file.
+# 
+# Once the BCR module is fixed, you can simply use:
+# bazel_dep(name = "argparse", version = "3.2.0")
+
+# Use module extension for argparse (fixes Bazel 9 compatibility issue)
+argparse = use_extension("//:extensions.bzl", "argparse_extension")
+use_repo(argparse, "argparse")
+
+# -- use_repo_rule statements -- #
+
+# -- repo definitions -- #

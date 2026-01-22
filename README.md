@@ -1,6 +1,32 @@
 # Axis-Aligned Bounding Box Simulation
 Runs a simulation to find the average ratio of the area of a polygon to its axis-aligned bounding box.
 
+## Install Bazel
+
+### Clean up (if needed)
+```bash
+sudo apt remove bazel-bootstrap
+```
+
+### One time step
+```bash
+sudo apt install apt-transport-https curl gnupg -y
+curl -fsSL https://bazel.build/bazel-release.pub.gpg | gpg --dearmor >bazel-archive-keyring.gpg
+sudo mv bazel-archive-keyring.gpg /usr/share/keyrings
+echo "deb [arch=amd64 signed-by=/usr/share/keyrings/bazel-archive-keyring.gpg] https://storage.googleapis.com/bazel-apt stable jdk1.8" | sudo tee /etc/apt/sources.list.d/bazel.list
+```
+
+### Install and update
+```bash
+sudo apt update && sudo apt install bazel
+```
+
+### Periodically
+Run this to refresh compile commands and improve clangd integration with VSCode or Cursor
+```bash
+bazel run @hedron_compile_commands//:refresh_all
+```
+
 ## Build Instructions
 
 ### Command Line

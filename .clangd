@@ -1,6 +1,17 @@
-CompileFlags:
-  Add: [-std=c++20, -Iinclude, -Wall, -Wextra]
-  
-# Note: For full Bazel integration, you can generate compile_commands.json manually
-# using tools like 'bazel-compile-commands-extractor' or 'hedgehog'
-# For now, the include paths above should be sufficient for basic clangd support
+Diagnostics:
+  UnusedIncludes: Strict
+  MissingIncludes: Strict
+  ClangTidy:
+    Add: [*]
+    Remove: [modernize-use-trailing-return-type]
+
+Index:
+  Background: Build
+
+Completion:
+  AllScopes: true
+
+InlayHints:
+  Enabled: Yes
+  ParameterNames: Yes
+  DeducedTypes: Yes
