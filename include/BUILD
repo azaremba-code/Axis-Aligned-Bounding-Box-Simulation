@@ -8,3 +8,11 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+cc_library(
+    name = "simulation",
+    hdrs = [
+        "simulation/ISimulation.h",
+    ],
+    includes = ["."],
+    visibility = ["//visibility:public"],
+)

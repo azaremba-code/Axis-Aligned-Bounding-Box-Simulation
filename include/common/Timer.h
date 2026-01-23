@@ -24,9 +24,9 @@ public:
 		if (!m_isRunning) {
 			return;
 		}
-		DurationType stopTime {std::chrono::steady_clock::now()};
-		m_timeElapsed += stopTime - m_startTime;
-		m_startTime = stopTime;
+		m_isRunning = false;
+		DurationType now {std::chrono::steady_clock::now()};
+		m_timeElapsed += now - m_startTime;
 	}
 
 	TimeElapsedType getTimeElapsed() const {
@@ -49,11 +49,15 @@ public:
 		m_isRunning = false;
 	}
 
+	bool isRunning() const {
+		return m_isRunning;
+	}
+
 	~Timer() {
 		if (m_isRunning) {
 			stop();
+			printTime("total");
 		}
-		printTime("total");
 	}
 
 private:

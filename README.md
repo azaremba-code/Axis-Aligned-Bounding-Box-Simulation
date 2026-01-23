@@ -28,6 +28,30 @@ bazel run @hedron_compile_commands//:refresh_all
 ```
 
 ## Build Instructions
+It is not necessary to build everything, but it is available.  Running any of the targets will automatically build them.
+```bash
+bazel build //:all
+```
+
+To clean quick
+```bash
+bazel clean
+```
+
+To clean *hard*
+```bash
+bazel clean --expunge
+```
+
+### Running simulations
+Harness cmd line options:
+```bash
+bazel run //harness:main --config=opt -- -h
+```
+Running multiple threads with adrian1
+```bash
+bazel run //harness:main --config=opt -- -n 100000000 -t 16 -s adrian1
+```
 
 ### Command Line
 

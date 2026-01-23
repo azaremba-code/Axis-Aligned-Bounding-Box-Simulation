@@ -1,53 +1,67 @@
-#ifndef SIMULATION_H
-#define SIMULATION_H
+#ifndef SIMULATION_ADRIAN1_H
+#define SIMULATION_ADRIAN1_H
 
 #include <cassert>
 #include <cmath>
+#include <algorithm>
+#include <concepts>
+#include <random>
+#include <vector>
+#include <utility>
 
-#include "Random.h"
+#include "simulation/ISimulation.h"
 
 template <std::floating_point FloatType>
-class Simulation {
+class SimulationAdrian1 : public simulation::ISimulation<FloatType> {
 public:
-	Simulation(int polygonPointCount = 3) :
-		m_polygonPointCount {polygonPointCount},
-		m_runCount {0},
-		m_RatiosSum {0}
-	{
-		assert(m_polygonPointCount >= 3 && "Polygons must have at least 3 points.");
+
+	SimulationAdrian1(int runCount, int polygonPointCount = 3) :
+		simulation::ISimulation<FloatType>(runCount, polygonPointCount),
+		m_ratiosSum {0}
+	{}
+
+
+	FloatType getAverageRatio() const override {
+		assert(simulation::ISimulation<FloatType>::getRunCount() > 0 && "Must run at least once.");
+		return m_ratiosSum / simulation::ISimulation<FloatType>::getRunCount();
 	}
 
-	FloatType getAverageRatio() {
-		assert(m_runCount > 0 && "Must run at least once.");
-		return m_RatiosSum / m_runCount;
-	}
 
-	void runMany(int runCount = 1) {
-		for (int i {1}; i <= runCount; i++) {
+	void run() override {
+		for (int i {1}; i <= simulation::ISimulation<FloatType>::getRunCount(); ++i) {
 			runOne();
 		}
 	}
 
+	FloatType getSumOfRatios() const override {
+		return m_ratiosSum;
+	}
+
+	private:
 	void runOne() {
 		std::vector<Point> points {};
-		points.reserve(m_polygonPointCount);
+		points.reserve(simulation::ISimulation<FloatType>::getPolygonPointCount());
 
-		for (int i {0}; i < m_polygonPointCount; i++) {
-			FloatType x {Random::get<FloatType>()};
-			FloatType y {Random::get<FloatType>()};
+		
+		// std::generate_n(std::back_inserter(points), m_polygonPointCount, [this]() {
+		// 	return Point {m_dist(m_mt), m_dist(m_mt)};
+		// });
+			
+		for (int i {0}; i < simulation::ISimulation<FloatType>::getPolygonPointCount(); i++) {
+			FloatType x {m_dist(m_mt)};
+			FloatType y {m_dist(m_mt)};
 			points.emplace_back(x, y);
 		}
-		
+			
 		FloatType polygonArea {getPolygonArea(points)};
-
+		
 		const auto& [bottomLeft, topRight] = getBoundingBoxCorners(points);
 		const FloatType width {topRight.x - bottomLeft.x};
 		const FloatType height {topRight.y - bottomLeft.y};
 		FloatType boundingBoxArea {width * height};
 
 		FloatType ratio {polygonArea / boundingBoxArea};
-		m_RatiosSum += ratio;
-		m_runCount++;	
+		m_ratiosSum += ratio;
 	}
 
 private:
@@ -56,9 +70,9 @@ private:
 		FloatType y {};
 	};
 
-	int m_polygonPointCount {};	
-	int m_runCount {};
-	FloatType m_RatiosSum {};
+	FloatType m_ratiosSum {};
+	std::mt19937 m_mt {std::random_device{}()};
+	std::uniform_real_distribution<FloatType> m_dist {1.0, 2.0};
 
 	static FloatType getPolygonArea(const std::vector<Point>& points) {
 		FloatType area {0};
