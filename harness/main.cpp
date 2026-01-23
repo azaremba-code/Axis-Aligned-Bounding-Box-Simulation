@@ -1,15 +1,21 @@
-#include <iostream>
-#include <thread>
-#include <vector>
 #include <algorithm>
+#include <cstdlib>
+#include <iostream>
+#include <map>
+#include <memory>
 #include <pthread.h>
 #include <sched.h>
+#include <stdexcept>
+#include <string>
+#include <thread>
+#include <utility>
+#include <vector>
 
 #include <argparse/argparse.hpp>
 
-#include "simulation/ISimulation.h"
-#include "common/Timer.h"
 #include "common/Concurrency.h"
+#include "common/Timer.h"
+#include "simulation/ISimulation.h"
 
 #include "SimulationAdrian1.h"
 #include "SimulationEugene1.h"
@@ -33,7 +39,7 @@ int main(int argc, char* argv[]) {
 	program.add_argument("-t", "--mxthreads").help("maximum number of threads").default_value(mxthreads).scan<'i', int>();
 	program.add_argument("-g", "--ngon").help("number of points of the polygon").default_value(ngon).scan<'i', int>();
 	program.add_argument("-s", "--simulation").help("simulation name, e.g. adrian1 or eugene1").default_value(simulationName);
-	program.add_argument("-v", "--verbose").help("verbose output").default_value(verbose).implicit_value(false);
+	program.add_argument("-v", "--verbose").help("verbose output").default_value(verbose).implicit_value(true);
 
 	try {
 		program.parse_args(argc, argv);
@@ -62,6 +68,15 @@ int main(int argc, char* argv[]) {
 
 	if (verbose) {
 		Concurrency::print_physical_core_mapping();
+	}
+
+	// get the physical core id mapping
+	auto physicalCoreIdMapping = Concurrency::get_physical_core_mapping();
+	std::map<int, int> physicalToLogicalCoreMapping {};
+	int physicalCoreId = 0;
+	for (const auto& [socketId, coreId] : physicalCoreIdMapping) {
+		physicalToLogicalCoreMapping[physicalCoreId] = coreId.front();
+		physicalCoreId++;
 	}
 
 	// we will give core 0 to the OS
@@ -97,17 +112,17 @@ int main(int argc, char* argv[]) {
 	
     for (int i = 0; i < numThreads; i++) {
 		int numRuns = numRunsPerThread + ((i==0)? runsAdjustment : 0);
-        threads.emplace_back([i, ngon, numRuns, &results, simulationName]() {
-			// TODO: use physical core id mapping to get the correct core id
-			int coreId = 2*(i + 1);
+        threads.emplace_back([i, ngon, numRuns, &results, simulationName, &physicalToLogicalCoreMapping]() {
+			auto coreId = physicalToLogicalCoreMapping[i+1]; // shifting by 1 to give the main thread core 0
 			if (!Concurrency::pin_to_core(coreId)) {
 				ERROR_OUTPUT("Failed to pin thread " << i << " to core " << coreId);
 			}
-			simulation::ISimulation<double>* sim {nullptr};
+			// the sim pointer below should be a unique pointer
+			std::unique_ptr<simulation::ISimulation<double>> sim {nullptr};
 			if (simulationName == "adrian1") {
-				sim = new SimulationAdrian1<double>(numRuns, ngon);
+				sim = std::make_unique<SimulationAdrian1<double>>(numRuns, ngon);
 			} else if (simulationName == "eugene1") {
-				sim = new SimulationEugene1<double>(numRuns, ngon);
+				sim = std::make_unique<SimulationEugene1<double>>(numRuns, ngon);
 			} else {
 				ERROR_OUTPUT("Invalid simulation name: " << simulationName);
 				exit(-1);

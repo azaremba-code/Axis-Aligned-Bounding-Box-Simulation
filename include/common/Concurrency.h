@@ -1,18 +1,17 @@
 #ifndef CONCURRENCY_H
 #define CONCURRENCY_H
 
+#include <cstdio>
 #include <fstream>
 #include <iostream>
 #include <map>
 #include <pthread.h>
 #include <sched.h>
 #include <set>
-#include <sstream>
-#include <string>
-#include <thread>
+#include <unistd.h>
+#include <utility>
 #include <utility>
 #include <vector>
-#include <unistd.h>
 
 class Concurrency {
 public:

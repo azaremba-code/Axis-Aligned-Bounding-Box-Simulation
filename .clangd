@@ -2,7 +2,7 @@ Diagnostics:
   UnusedIncludes: Strict
   MissingIncludes: Strict
   ClangTidy:
-    Add: [*]
+    # Add: [*]
     Remove: [modernize-use-trailing-return-type]
 
 Index:
