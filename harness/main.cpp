@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <array>
 #include <cstdlib>
 #include <iostream>
 #include <map>
@@ -7,6 +8,7 @@
 #include <sched.h>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <thread>
 #include <utility>
 #include <vector>
@@ -19,6 +21,8 @@
 
 #include "SimulationAdrian1.h"
 #include "SimulationEugene1.h"
+#include "SimulationEugene2.h"
+#include "SimulationEugene3.h"
 
 // TODO: Change this to a constexpr function instead of macro for better safety
 #define VERBOSE_OUTPUT(msg) if (verbose) { std::cout << msg << std::endl; }
@@ -56,10 +60,11 @@ int main1(int argc, char* argv[]) {
 	simulationName = program.get<std::string>("--simulation");
 	verbose = program.get<bool>("--verbose");
 
-    if (simulationName != "adrian1" && simulationName != "eugene1") {
-        ERROR_OUTPUT("Invalid simulation name: " << simulationName);
-        return 1;
-    }
+	constexpr std::array<const char*, 4> validSimulations = {"adrian1", "eugene1", "eugene2", "eugene3"};
+    if (std::find(validSimulations.begin(), validSimulations.end(), simulationName) == validSimulations.end()) {
+		ERROR_OUTPUT("Invalid simulation name: " << simulationName);
+		return 1;
+	}
 
 		int numSockets = Concurrency::get_num_physical_cpus();
 	int numOfPhysicalCores = Concurrency::get_num_physical_cores();
@@ -124,6 +129,10 @@ if (verbose) {
 				sim = std::make_unique<SimulationAdrian1<double>>(numRuns, ngon);
 			} else if (simulationName == "eugene1") {
 				sim = std::make_unique<SimulationEugene1<double>>(numRuns, ngon);
+			} else if (simulationName == "eugene2") {
+				sim = std::make_unique<SimulationEugene2<double>>(numRuns, ngon);
+			} else if (simulationName == "eugene3") {
+				sim = std::make_unique<SimulationEugene3<double>>(numRuns, ngon);
 			} else {
 				ERROR_OUTPUT("Invalid simulation name: " << simulationName);
 				exit(-1);
@@ -156,9 +165,9 @@ if (verbose) {
 
 int main2(int argc, char* argv[]) {
 	constexpr int defaultNSims {1'000'000'000};
-	constexpr int defaultMaxthreads {30};
+	constexpr int defaultMaxThreads {30};
 	constexpr int defaultNgon {3};
-	constexpr std::string defaultSimulationName {"adrian1"};
+	constexpr std::string_view defaultSimulationName {"adrian1"};
 	constexpr bool defaultVerbose {false};
 
     argparse::ArgumentParser program("eugene2");
@@ -183,8 +192,8 @@ int main2(int argc, char* argv[]) {
     const bool verbose {program.get<bool>("--verbose")};
 
 	using namespace std::literals::string_literals; // for ""s suffix, to enable CTAD for std::array
-	constexpr std::array validNames {"adrian1"s, "eugene1"s};
-	constexpr bool isValidName = std::find(validNames.begin(), validNames.end(), simulationName) != validNames.end();
+	constexpr std::array<const char*, 2> validNames {"adrian1", "eugene1"};
+	const bool isValidName = std::find(validNames.begin(), validNames.end(), simulationName) != validNames.end();
 
     if (!isValidName) {
         std::cerr << "Invalid simulation name: " << simulationName << "\n";
@@ -223,23 +232,24 @@ int main2(int argc, char* argv[]) {
     }
 	
 	// determine the number of threads to use
-    const int numThreads {std::max(1, std::min(mxthreads, coresToUse - 1))};  // leave one core for the OS
-    if (numThreads != mxthreads) {
-        INFO_OUTPUT("WARN: Number of threads adjusted from " << mxthreads << " to " << numThreads << " for optimal performance");
+    const int numThreads {std::max(1, std::min(maxThreads, coresToUse - 1))};  // leave one core for the OS
+    if (numThreads != maxThreads) {
+        INFO_OUTPUT("WARN: Number of threads adjusted from " << maxThreads << " to " << numThreads << " for optimal performance");
     }
-    const int numRunsPerThread {nsims / numThreads};
-    const int runsAdjustment {nsims - numRunsPerThread * numThreads};
-    VERBOSE_OUTPUT("Will use " << numThreads << " threads to run " << nsims << " simulations with " << numRunsPerThread << " runs per thread and " << runsAdjustment << " runs adjustment");
+    const int numRunsPerThread {nSims / numThreads};
+    const int runsAdjustment {nSims - numRunsPerThread * numThreads};
+    VERBOSE_OUTPUT("Will use " << numThreads << " threads to run " << nSims << " simulations with " << numRunsPerThread << " runs per thread and " << runsAdjustment << " runs adjustment");
     // std::cout << "Runs adjustment: " << runsAdjustment << std::endl;
 
     INFO_OUTPUT("Using simulation: " << simulationName);
 
     Timer timer {};
 
-	std::vector<std::unique_ptr<simulation::ISimulation>> sims {};
+	std::vector<std::unique_ptr<simulation::ISimulation<double>>> sims {};
 	sims.reserve(numThreads);
 
 	for (int i {0}; i < numThreads; i++) {
+		const int numRuns = numRunsPerThread + ((i==0)? runsAdjustment : 0);
 		if (simulationName == "adrian1") {
 			sims.push_back(std::make_unique<SimulationAdrian1<double>>(numRuns, ngon));
 		} else if (simulationName == "eugene1") {
@@ -255,14 +265,14 @@ int main2(int argc, char* argv[]) {
 	threads.reserve(numThreads);
 	
 	for (int i {0}; i < numThreads; i++) {
-		threads.emplace_back([&sims, &physicalToLogicalCoreMapping] {
+		threads.emplace_back([i, &sims, &physicalToLogicalCoreMapping] {
 			auto coreId = physicalToLogicalCoreMapping[i+1]; // shifting by 1 to give the main thread core 0
             if (!Concurrency::pin_to_core(coreId)) {
                 ERROR_OUTPUT("Failed to pin thread " << i << " to core " << coreId);
             }
 
 			sims[i]->run();
-		}
+		});
 	}
 
 	for (auto& thread : threads) {

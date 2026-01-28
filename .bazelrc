@@ -12,6 +12,42 @@ build:dbg --copt=-O0
 build:opt --compilation_mode=opt
 build:opt --copt=-O3
 build:opt --copt=-DNDEBUG
+build:opt --copt=-march=native
+build:opt --copt=-mtune=native
+build:opt --copt=-ffast-math
+build:opt --copt=-funroll-loops
+build:opt --copt=-mavx2
+build:opt --copt=-mfma
+build:opt --copt=-fno-trapping-math
+
+# Profiling build (optimized with debug symbols)
+build:prof --compilation_mode=opt
+build:prof --copt=-O3
+build:prof --copt=-g
+build:prof --copt=-fno-omit-frame-pointer
+build:prof --copt=-DNDEBUG
+
+# Compiler selection
+# By default, Bazel uses your system C++ toolchain (typically g++).
+# These configs let you explicitly select g++ or clang for a build.
+build:gcc --action_env=CC=/usr/bin/gcc
+build:gcc --action_env=CXX=/usr/bin/g++
+
+build:clang --action_env=CC=/usr/bin/clang
+build:clang --action_env=CXX=/usr/bin/clang++
+
+# Optimized builds with explicit compiler selection
+# These combine the :opt settings above with a specific compiler.
+build:gcc_opt --config=opt --config=gcc
+build:clang_opt --config=opt --config=clang
+
+# gprof build (for GNU profiler - good WSL2 alternative)
+build:gprof --compilation_mode=opt
+build:gprof --copt=-O3
+build:gprof --copt=-g
+build:gprof --copt=-pg
+build:gprof --linkopt=-pg
+build:gprof --copt=-DNDEBUG
 
 # Common settings
 build --cxxopt=-std=c++20

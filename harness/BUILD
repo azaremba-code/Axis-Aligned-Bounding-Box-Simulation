@@ -4,13 +4,18 @@ cc_binary(
     name = "main",
     srcs = [
         "main.cpp",
+        
         "SimulationAdrian1.h",
+
         "SimulationEugene1.h",
+        "SimulationEugene2.h",
+        "SimulationEugene3.h",
     ],
     deps = [
         "//include:common",
         "//include:simulation",
         "@argparse",
+        "@highway//:hwy",
     ],
     copts = [
         "-std=c++20",

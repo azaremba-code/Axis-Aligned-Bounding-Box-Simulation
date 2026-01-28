@@ -189,7 +189,7 @@
   "moduleExtensions": {
     "//:extensions.bzl%argparse_extension": {
       "general": {
-        "bzlTransitiveDigest": "Sx0mNEKdYg8xlDfxNOVKN7ObJaqOqd7T6aCQ+kgBdIk=",
+        "bzlTransitiveDigest": "cypUaniPjlgwIEF+jREolWrEdB8JVvlRaAD+jai7wJ4=",
         "usagesDigest": "8IfAkUeSbkFDjejnNQqX6ccdEN7NJi1QqRv7o8hH9Fg=",
         "recordedInputs": [
           "REPO_MAPPING:,bazel_tools bazel_tools"
@@ -201,6 +201,25 @@
               "url": "https://github.com/p-ranav/argparse/archive/refs/tags/v3.2.tar.gz",
               "strip_prefix": "argparse-3.2",
               "build_file_content": "\nload(\"@rules_cc//cc:defs.bzl\", \"cc_library\")\n\ncc_library(\n    name = \"argparse\",\n    hdrs = [\"include/argparse/argparse.hpp\"],\n    includes = [\"include\"],\n    visibility = [\"//visibility:public\"],\n)\n"
+            }
+          }
+        }
+      }
+    },
+    "//:extensions.bzl%highway_extension": {
+      "general": {
+        "bzlTransitiveDigest": "cypUaniPjlgwIEF+jREolWrEdB8JVvlRaAD+jai7wJ4=",
+        "usagesDigest": "aTT0rH4XQBgVjyj45Ky2YBGg3Ui+2Z2x+ZGI5G2Dqfo=",
+        "recordedInputs": [
+          "REPO_MAPPING:,bazel_tools bazel_tools"
+        ],
+        "generatedRepoSpecs": {
+          "highway": {
+            "repoRuleId": "@@bazel_tools//tools/build_defs/repo:http.bzl%http_archive",
+            "attributes": {
+              "url": "https://github.com/google/highway/archive/refs/tags/1.2.0.tar.gz",
+              "strip_prefix": "highway-1.2.0",
+              "build_file_content": "\nload(\"@rules_cc//cc:defs.bzl\", \"cc_library\")\n\ncc_library(\n    name = \"hwy\",\n    hdrs = glob([\"hwy/**/*.h\"]),\n    includes = [\".\"],\n    copts = [\n        \"-DHWY_STATIC_DEFINE\",\n        \"-std=c++17\",\n    ],\n    visibility = [\"//visibility:public\"],\n)\n"
             }
           }
         }

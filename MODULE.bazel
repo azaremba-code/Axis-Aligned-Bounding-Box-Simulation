@@ -37,6 +37,10 @@ archive_override(
 argparse = use_extension("//:extensions.bzl", "argparse_extension")
 use_repo(argparse, "argparse")
 
+# Use module extension for Highway SIMD library
+highway = use_extension("//:extensions.bzl", "highway_extension")
+use_repo(highway, "highway")
+
 # -- use_repo_rule statements -- #
 
 # -- repo definitions -- #

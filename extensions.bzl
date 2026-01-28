@@ -19,6 +19,31 @@ cc_library(
 """,
     )
 
+def _highway_extension_impl(module_ctx):
+    http_archive(
+        name = "highway",
+        url = "https://github.com/google/highway/archive/refs/tags/1.2.0.tar.gz",
+        strip_prefix = "highway-1.2.0",
+        build_file_content = """
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+cc_library(
+    name = "hwy",
+    hdrs = glob(["hwy/**/*.h"]),
+    includes = ["."],
+    copts = [
+        "-DHWY_STATIC_DEFINE",
+        "-std=c++17",
+    ],
+    visibility = ["//visibility:public"],
+)
+""",
+    )
+
 argparse_extension = module_extension(
     implementation = _argparse_extension_impl,
+)
+
+highway_extension = module_extension(
+    implementation = _highway_extension_impl,
 )
