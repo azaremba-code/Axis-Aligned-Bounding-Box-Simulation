@@ -23,6 +23,8 @@
 #include "SimulationEugene1.h"
 #include "SimulationEugene2.h"
 #include "SimulationEugene3.h"
+#include "SimulationEugene4.h"
+#include "SimulationEugene5.h"
 
 // TODO: Change this to a constexpr function instead of macro for better safety
 #define VERBOSE_OUTPUT(msg) if (verbose) { std::cout << msg << std::endl; }
@@ -60,7 +62,7 @@ int main1(int argc, char* argv[]) {
 	simulationName = program.get<std::string>("--simulation");
 	verbose = program.get<bool>("--verbose");
 
-	constexpr std::array<const char*, 4> validSimulations = {"adrian1", "eugene1", "eugene2", "eugene3"};
+	constexpr std::array<const char*, 6> validSimulations = {"adrian1", "eugene1", "eugene2", "eugene3", "eugene4", "eugene5"};
     if (std::find(validSimulations.begin(), validSimulations.end(), simulationName) == validSimulations.end()) {
 		ERROR_OUTPUT("Invalid simulation name: " << simulationName);
 		return 1;
@@ -133,6 +135,10 @@ if (verbose) {
 				sim = std::make_unique<SimulationEugene2<double>>(numRuns, ngon);
 			} else if (simulationName == "eugene3") {
 				sim = std::make_unique<SimulationEugene3<double>>(numRuns, ngon);
+			} else if (simulationName == "eugene4") {
+				sim = std::make_unique<SimulationEugene4<double>>(numRuns, ngon);
+			} else if (simulationName == "eugene5") {
+				sim = std::make_unique<SimulationEugene5<double>>(numRuns, ngon);
 			} else {
 				ERROR_OUTPUT("Invalid simulation name: " << simulationName);
 				exit(-1);

@@ -10,6 +10,8 @@ cc_binary(
         "SimulationEugene1.h",
         "SimulationEugene2.h",
         "SimulationEugene3.h",
+        "SimulationEugene4.h",
+        "SimulationEugene5.h",
     ],
     deps = [
         "//include:common",
