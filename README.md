@@ -27,6 +27,55 @@ Run this to refresh compile commands and improve clangd integration with VSCode 
 bazel run @hedron_compile_commands//:refresh_all
 ```
 
+## Install CUDA
+
+### Step 1: Install the Windows Host Driver 
+Before working in WSL, ensure the latest NVIDIA driver is installed on your Windows host. This driver provides the necessary kernel interface for WSL. 
+
+### Step 2: WSL Installation Commands
+Open your Ubuntu terminal and run these commands one by one. These use the full filenames required by the NVIDIA servers: 
+Install the CUDA Toolkit in your Ubuntu terminal by running the following commands to download necessary files, set up the CUDA repository, and install the toolkit: 
+
+#### Download and move the repository pin file:
+```bash
+wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-wsl-ubuntu.pin
+sudo mv cuda-wsl-ubuntu.pin /etc/apt/preferences.d/cuda-repository-pin-600
+```
+#### Download and install the keyring package to authorize the repository:
+```bash
+wget https://developer.download.nvidia.com/compute/cuda/repos/wsl-ubuntu/x86_64/cuda-keyring_1.1-1_all.deb
+sudo dpkg -i cuda-keyring_1.1-1_all.deb
+```
+#### Update the package list and install the CUDA Toolkit:
+```bash
+sudo apt-get update
+sudo apt-get -y install cuda-toolkit
+```
+
+### Step 3: Post-Installation (Path Setup)
+Update your system's PATH and LD_LIBRARY_PATH by adding the following to your shell profile (e.g., ~/.bashrc) and then sourcing it:
+```bash
+echo 'export PATH=/usr/local/cuda/bin${PATH:+:${PATH}}' >> ~/.bashrc
+echo 'export LD_LIBRARY_PATH=/usr/local/cuda/lib64${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}}' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### Step 4: Verify the Install
+Confirm the installation using ```nvidia-smi``` and ```nvcc --version```. 
+
+**Important**: Avoid installing NVIDIA drivers inside WSL using apt, as it can interfere with the Windows host driver bridge. 
+
+### Step 5: Clean up
+It is safe to delete ```cuda-keyring_1.1-1_all.deb``` file.
+
+### NOTES on CUDA architecture
+These tests were run using NVIDIA RTX 4060 hardware, which required a specific setting in ```.bazelrc```.  Please update this option for you own hardware, if needed.
+
+```skylark
+# from .bazelrc
+build:cuda --@rules_cuda//cuda:archs=sm_89
+```
+
 ## Build Instructions
 It is not necessary to build everything, but it is available.  Running any of the targets will automatically build them.
 ```bash
@@ -51,6 +100,10 @@ bazel run //harness:main --config=opt -- -h
 Running multiple threads with adrian1
 ```bash
 bazel run //harness:main --config=opt -- -n 100000000 -t 16 -s adrian1
+```
+Running CUDA implementation (```-h``` for help)
+```bash
+bazel run //cuda:main --config=cuda -- -n 2000000000 -g 3 -p float
 ```
 
 ### Command Line

@@ -225,6 +225,34 @@
         }
       }
     },
+    "@@rules_cuda+//cuda:extensions.bzl%toolchain": {
+      "general": {
+        "bzlTransitiveDigest": "ol/M2Xj9P4OdWJIUMoLQCDXYbs1Adi6Ywe2/Ro1Ekv4=",
+        "usagesDigest": "V4A+qh5ba/PxIxn+h/xS7o+O5dS4E6Ue5GiwBimQ/fE=",
+        "recordedInputs": [
+          "REPO_MAPPING:bazel_tools,rules_cc rules_cc+",
+          "REPO_MAPPING:rules_cc+,bazel_skylib bazel_skylib+",
+          "REPO_MAPPING:rules_cc+,bazel_tools bazel_tools",
+          "REPO_MAPPING:rules_cc+,cc_compatibility_proxy rules_cc++compatibility_proxy+cc_compatibility_proxy",
+          "REPO_MAPPING:rules_cc+,platforms platforms",
+          "REPO_MAPPING:rules_cc+,rules_cc rules_cc+",
+          "REPO_MAPPING:rules_cc++compatibility_proxy+cc_compatibility_proxy,rules_cc rules_cc+",
+          "REPO_MAPPING:rules_cuda+,bazel_tools bazel_tools",
+          "REPO_MAPPING:rules_cuda+,rules_cc rules_cc+"
+        ],
+        "generatedRepoSpecs": {
+          "cuda": {
+            "repoRuleId": "@@rules_cuda+//cuda/private:repositories.bzl%cuda_toolkit",
+            "attributes": {
+              "components_mapping": {},
+              "nvcc_version": "",
+              "toolkit_path": "/usr/local/cuda",
+              "version": ""
+            }
+          }
+        }
+      }
+    },
     "@@rules_kotlin+//src/main/starlark/core/repositories:bzlmod_setup.bzl%rules_kotlin_extensions": {
       "general": {
         "bzlTransitiveDigest": "ABI1D/sbS1ovwaW/kHDoj8nnXjQ0oKU9fzmzEG4iT8o=",

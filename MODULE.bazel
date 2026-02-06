@@ -7,6 +7,7 @@ module(
 # -- bazel_dep definitions -- #
 bazel_dep(name = "rules_cc", version = "0.2.14")
 bazel_dep(name = "rules_python", version = "1.7.0")
+bazel_dep(name = "rules_cuda", version = "0.0.0")
 
 # Hedron's Compile Commands Extractor for Bazel
 # https://github.com/hedronvision/bazel-compile-commands-extractor
@@ -25,6 +26,12 @@ archive_override(
     patch_strip = 0,
 )
 
+archive_override(
+    module_name = "rules_cuda",
+    urls = ["https://github.com/bazel-contrib/rules_cuda/archive/refs/heads/main.tar.gz"],
+    strip_prefix = "rules_cuda-main",
+)
+
 # Note: argparse 3.2.0 from BCR (https://registry.bazel.build/modules/argparse) has a bug:
 # The BUILD.bazel file is missing the required `load("@rules_cc//cc:defs.bzl", "cc_library")` 
 # statement needed for Bazel 9 compatibility. Until this is fixed in BCR, we use a 
@@ -40,6 +47,14 @@ use_repo(argparse, "argparse")
 # Use module extension for Highway SIMD library
 highway = use_extension("//:extensions.bzl", "highway_extension")
 use_repo(highway, "highway")
+
+# CUDA toolchain
+cuda = use_extension("@rules_cuda//cuda:extensions.bzl", "toolchain")
+cuda.toolkit(
+    name = "cuda",
+    toolkit_path = "/usr/local/cuda",
+)
+use_repo(cuda, "cuda")
 
 # -- use_repo_rule statements -- #
 

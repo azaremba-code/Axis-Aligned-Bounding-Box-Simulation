@@ -20,6 +20,11 @@ build:opt --copt=-mavx2
 build:opt --copt=-mfma
 build:opt --copt=-fno-trapping-math
 
+# CUDA build (uses rules_cuda toolchain)
+build:cuda --config=opt
+build:cuda --repo_env=CUDA_PATH=/usr/local/cuda
+build:cuda --@rules_cuda//cuda:archs=sm_89
+
 # Profiling build (optimized with debug symbols)
 build:prof --compilation_mode=opt
 build:prof --copt=-O3
