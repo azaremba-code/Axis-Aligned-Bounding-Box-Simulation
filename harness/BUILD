@@ -16,6 +16,7 @@ cc_binary(
     deps = [
         "//include:common",
         "//include:simulation",
+        "//include:rng",
         "@argparse",
         "@highway//:hwy",
     ],

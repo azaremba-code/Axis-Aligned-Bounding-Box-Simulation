@@ -10,6 +10,8 @@
 #include <utility>
 
 #include "simulation/ISimulation.h"
+#include "rng/Xorshift128PlusSSE2.h"
+
 
 template <std::floating_point FloatType>
 class SimulationEugene1 : public simulation::ISimulation<FloatType> {
@@ -48,8 +50,11 @@ public:
 		// });
 			
 		for (int i {0}; i < simulation::ISimulation<FloatType>::getPolygonPointCount(); i++) {
-			FloatType x {m_dist(m_mt)};
-			FloatType y {m_dist(m_mt)};
+			__m128d pt = m_rng.nextPoint(1.0, 2.0);  // one (x,y) per call, all in registers
+			double x = rng::Xorshift128PlusSSE2::getX(pt);
+			double y = rng::Xorshift128PlusSSE2::getY(pt);			
+			// FloatType x {m_dist(m_mt)};
+			// FloatType y {m_dist(m_mt)};
 			points.emplace_back(x, y);
 		}
 			
@@ -73,6 +78,9 @@ private:
 	FloatType m_ratiosSum {};
 	std::mt19937 m_mt {std::random_device{}()};
 	std::uniform_real_distribution<FloatType> m_dist {1.0, 2.0};
+
+	rng::Xorshift128PlusSSE2 m_rng {42};
+
 
 	static FloatType getPolygonArea(const std::vector<Point>& points) {
 		FloatType area {0};

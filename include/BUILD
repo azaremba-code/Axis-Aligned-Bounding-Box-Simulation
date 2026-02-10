@@ -16,3 +16,12 @@ cc_library(
     includes = ["."],
     visibility = ["//visibility:public"],
 )
+
+cc_library(
+    name = "rng",
+    hdrs = [
+        "rng/Xorshift128PlusSSE2.h",
+    ],
+    includes = ["."],
+    visibility = ["//visibility:public"],
+)
