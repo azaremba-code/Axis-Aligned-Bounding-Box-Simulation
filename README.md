@@ -106,15 +106,112 @@ Running CUDA implementation (```-h``` for help)
 bazel run //cuda:main --config=cuda -- -n 2000000000 -g 3 -p float
 ```
 
-### Command Line
+## Install Perf on WSL2
+
+### One time step
+
+Install build dependencies:
+```bash
+sudo apt update
+sudo apt install -y \
+  build-essential \
+  git \
+  python3 python3-dev \
+  flex bison \
+  libelf-dev \
+  libdw-dev \
+  libunwind-dev \
+  libtraceevent-dev \
+  libssl-dev \
+  pkg-config
+```
+
+Clone kernel source:
+```bash
+cd ~
+git clone --depth 1 https://github.com/microsoft/WSL2-Linux-Kernel.git
+```
+
+Build perf:
+```bash
+cd ~/WSL2-Linux-Kernel/tools/perf
+make clean
+make -j$(nproc)
+```
+
+Install perf:
+```bash
+sudo cp perf /usr/local/bin/
+```
+
+Check path:
+```bash
+which perf
+```
+If this doesn't read ```/usr/local/bin/perf```, then update PATH:
+```bash
+echo 'export PATH=/usr/local/bin:$PATH' >> ~/.bashrc
+source ~/.bashrc
+```
+
+Check for success:
+```bash
+which perf
+perf --version
+```
+
+### Sample Usage
+
+Record first:
+```bash
+bazel build //harness:main -c opt --strip=never --copt=-g
+perf record --call-graph=dwarf ./bazel-bin/harness/main -n 100000000 -t 16 -s adrian1
+```
+
+Report result:
+```bash
+perf report
+```
+
+View annotated assembly:
+```bash
+perf annotate
+```
+
+## Set up Flame Graphs (for perf)
+
+### One time step
+Create a directory to install flame graph into, and move into that directory. Example:
+```bash
+cd ~ && mkdir tools && cd tools
+```
+
+Clone the flame graph repo:
+```bash
+git clone https://github.com/brendangregg/FlameGraph.git
+```
+
+Add it to PATH:
+```bash
+echo 'export PATH="$PATH:$HOME/tools/FlameGraph"' >> ~/.bashrc
+source ~/.bashrc
+```
+
+### Usage
+After "perf record", run:
+```bash
+perf script | stackcollapse-perf.pl | flamegraph.pl > flame.svg
+``` 
+
+## Command Line
 
 ```g++ -std=c++20 main.cpp```
 
-## Usage
+### Usage
 
 ```./a.out```
 
-## Dependencies
+### Dependencies
 g++ 13.x (libstdc++ 13.x) or later
 
 Included with default installation of g++ on Ubuntu-24.04
